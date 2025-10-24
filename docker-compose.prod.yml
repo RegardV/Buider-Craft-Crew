@@ -1,0 +1,134 @@
+# AI Crew Builder Team - Production Docker Compose Override
+# Production-specific configurations and optimizations
+
+version: '3.8'
+
+services:
+  # ==========================================
+  # Production Application Service
+  # ==========================================
+  builder-team:
+    build:
+      target: production
+    environment:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=WARNING
+      - DEBUG_MODE=false
+      - API_WORKERS=8
+      - API_RELOAD=false
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # ==========================================
+  # Production Worker Configuration
+  # ==========================================
+  worker:
+    build:
+      target: production
+    environment:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=WARNING
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+
+  # ==========================================
+  # Production Redis Configuration
+  # ==========================================
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 256M
+
+  # ==========================================
+  # Production PostgreSQL Configuration
+  # ==========================================
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=builder_team_prod
+      - POSTGRES_USER=appuser
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+      - ./backups:/backups
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U appuser -d builder_team_prod"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==========================================
+  # Production Nginx Configuration
+  # ==========================================
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./logs/nginx:/var/log/nginx
+      - static_files:/app/static
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+
+# ==========================================
+# Production Volumes
+# ==========================================
+volumes:
+  postgres_data_prod:
+  static_files:
+
+# ==========================================
+# Secrets Configuration
+# ==========================================
+secrets:
+  postgres_password:
+    external: true
+  api_keys:
+    external: true
