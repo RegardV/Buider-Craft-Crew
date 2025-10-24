@@ -1,0 +1,289 @@
+# Project Crew Configuration Template
+# This template configures new project crews to use OpenAI
+
+# Project Information (filled during initialization)
+project:
+  name: "{{PROJECT_NAME}}"
+  description: "{{PROJECT_DESCRIPTION}}"
+  version: "1.0.0"
+  created: "{{CREATION_DATE}}"
+
+# AI Provider Configuration for Project Crews
+provider:
+  name: "openai"
+  type: "openai"
+  model: "gpt-4-turbo-preview"  # Default model for project crews
+  description: "Primary AI provider for project crew execution"
+
+  # Alternative models for specific tasks
+  models:
+    reasoning: "gpt-4-turbo-preview"
+    coding: "gpt-4-turbo-preview"
+    analysis: "gpt-4-turbo-preview"
+    creative: "gpt-4-turbo-preview"
+
+  # Rate limiting and cost management
+  limits:
+    requests_per_minute: 350
+    tokens_per_minute: 200_000
+    daily_cost_limit: 50.0  # USD
+
+# Crew Configuration
+crew:
+  name: "{{PROJECT_NAME}}Crew"
+  description: "{{PROJECT_DESCRIPTION}}"
+
+  # Agent Definitions (based on user's target crew)
+  agents:
+    # This section will be populated during project initialization
+    # based on the user's defined target AI crew
+    {{#each TARGET_AGENTS}}
+    {{name}}:
+      name: "{{name}}"
+      role: "{{role}}"
+      goal: "{{goal}}"
+      backstory: "{{backstory}}"
+      provider: "openai"
+      model: "gpt-4-turbo-preview"
+
+      # Agent-specific tools
+      tools:
+        {{#each tools}}
+        - "{{this}}"
+        {{/each}}
+
+      # Agent configuration
+      allow_delegation: {{allow_delegation}}
+      verbose: {{verbose}}
+      max_iter: {{max_iter}}
+      memory: {{memory}}
+
+      # Specialized prompts
+      system_prompt: |
+        You are {{name}}, a {{role}} AI agent.
+
+        Your primary responsibilities:
+        {{#each responsibilities}}
+        - {{this}}
+        {{/each}}
+
+        Project Context:
+        {{project_context}}
+
+        Guidelines:
+        - Always follow OpenSpec specifications
+        - Coordinate with other crew members
+        - Document your decisions and actions
+        - Validate your work before completing tasks
+
+      execution_prompt: |
+        Task: {{task_description}}
+        Context: {{task_context}}
+        Dependencies: {{dependencies}}
+        Expected Output: {{expected_output}}
+
+    {{/each}}
+
+# Workflow Configuration
+workflows:
+  standard_execution:
+    description: "Standard workflow for most project tasks"
+    steps:
+      - "Task analysis and planning"
+      - "Agent coordination and task assignment"
+      - "Individual agent execution"
+      - "Result integration and validation"
+      - "Documentation and reporting"
+
+  creative_workflow:
+    description: "Workflow for creative and generative tasks"
+    steps:
+      - "Creative brief analysis"
+      - "Brainstorming and ideation"
+      - "Content creation and refinement"
+      - "Quality review and optimization"
+      - "Final output generation"
+
+  analytical_workflow:
+    description: "Workflow for data analysis and research tasks"
+    steps:
+      - "Data collection and preprocessing"
+      - "Analysis and interpretation"
+      - "Insight generation"
+      - "Report creation"
+      - "Validation and verification"
+
+# Tools Configuration
+tools:
+  # Built-in tools
+  file_operations:
+    enabled: true
+    permissions: ["read", "write", "create", "delete"]
+
+  web_search:
+    enabled: true
+    provider: "openai"
+    max_results: 10
+
+  code_execution:
+    enabled: false  # Disabled by default for security
+    sandbox: "restricted"
+
+  # Project-specific tools (configured during initialization)
+  custom_tools:
+    {{#each CUSTOM_TOOLS}}
+    {{name}}:
+      type: "{{type}}"
+      description: "{{description}}"
+      configuration: {{configuration}}
+    {{/each}}
+
+# Integration Configuration
+integrations:
+  openspec:
+    enabled: true
+    auto_sync: true
+    change_tracking: true
+
+  git:
+    enabled: true
+    auto_commit: false
+    branch_strategy: "feature-branches"
+
+  monitoring:
+    enabled: true
+    metrics_collection: true
+    performance_tracking: true
+
+# Quality Assurance
+quality_assurance:
+  testing:
+    automated_tests: true
+    coverage_target: 80
+    quality_gates: true
+
+  review:
+    peer_review: true
+    automated_review: true
+    security_scan: true
+
+  documentation:
+    auto_generate: true
+    update_on_change: true
+    standards_compliance: true
+
+# Performance Optimization
+performance:
+  caching:
+    enabled: true
+    strategy: "intelligent"
+
+  parallel_processing:
+    enabled: true
+    max_concurrent_agents: 5
+
+  resource_management:
+    memory_limit: "4GB"
+    timeout: 300  # seconds
+
+# Security Configuration
+security:
+  api_key_management:
+    encryption: true
+    rotation: true
+
+  data_protection:
+    encryption_at_rest: true
+    encryption_in_transit: true
+
+  access_control:
+    role_based: true
+    audit_logging: true
+
+# Monitoring and Logging
+monitoring:
+  metrics:
+    agent_performance: true
+    task_completion: true
+    error_rates: true
+    resource_usage: true
+
+  logging:
+    level: "INFO"
+    format: "structured"
+    retention: "30 days"
+
+  alerts:
+    error_threshold: 5
+    performance_threshold: 10
+    cost_threshold: 100
+
+# Cost Management
+cost_management:
+  budget:
+    daily_limit: 50.0
+    monthly_limit: 1000.0
+
+  optimization:
+    smart_routing: true
+    model_selection: true
+    caching: true
+
+  reporting:
+    daily_summary: true
+    weekly_report: true
+    monthly_analysis: true
+
+# Development Settings
+development:
+  debug_mode: false
+  verbose_logging: false
+  test_mode: false
+
+  hot_reload: false
+  auto_save: true
+
+  experimental_features:
+    enabled: false
+    beta_features: []
+
+# Production Settings
+production:
+  high_availability: true
+  load_balancing: true
+  disaster_recovery: true
+
+  scaling:
+    auto_scale: true
+    min_instances: 1
+    max_instances: 10
+
+  backup:
+    automated: true
+    frequency: "daily"
+    retention: "30 days"
+
+---
+# Configuration Notes
+
+## Provider Switching
+This template is configured for OpenAI, but can be easily switched to other providers:
+- claude: Change provider.name to "claude" and update model
+- zhipuai: Change provider.name to "zhipuai" and update model
+
+## Model Selection
+Choose appropriate models based on task requirements:
+- gpt-4-turbo-preview: Best for complex reasoning and coding
+- gpt-3.5-turbo: Good for simpler tasks, lower cost
+- Custom models: Can be configured as needed
+
+## Cost Management
+Monitor usage closely, especially during development:
+- Set appropriate limits
+- Enable cost alerts
+- Regular review of usage patterns
+
+## Security
+- Never commit API keys to version control
+- Use environment variables for sensitive data
+- Regular security audits and updates

@@ -1,0 +1,237 @@
+# Builder Crew Configuration
+# This crew uses Claude Code + ZhipuAI for strategic guidance and project building
+
+crew:
+  name: "BuilderCrew"
+  version: "1.0.0"
+  description: "AI crew for building and managing AI crew projects"
+
+  # AI Providers for Builder Crew
+  providers:
+    primary:
+      name: "claude"
+      type: "anthropic"
+      model: "claude-3-5-sonnet-20241022"
+      description: "Primary reasoning and strategic guidance"
+
+    secondary:
+      name: "zhipuai"
+      type: "zhipuai"
+      model: "glm-4.6"
+      description: "Support for specialized tasks and alternative perspectives"
+
+  # Advisory Team (Strategic Guidance)
+  advisory_team:
+    product_strategist:
+      name: "ProductStrategist"
+      role: "Product vision and strategic planning"
+      mbti: "ENTJ"
+      provider: "claude"
+      responsibilities:
+        - "Define project roadmap and milestones"
+        - "Make strategic decisions on feature prioritization"
+        - "Coordinate between advisory and application teams"
+        - "Validate business logic implementation"
+      tools:
+        - "strategic_analysis"
+        - "roadmap_planning"
+        - "decision_making"
+
+    technical_architect:
+      name: "TechnicalArchitect"
+      role: "System design and technical strategy"
+      mbti: "INTJ"
+      provider: "claude"
+      responsibilities:
+        - "Design overall system architecture"
+        - "Make technical decisions and trade-offs"
+        - "Review and approve technical implementations"
+        - "Ensure scalability and performance requirements"
+      tools:
+        - "architecture_design"
+        - "technical_review"
+        - "performance_analysis"
+
+    ux_designer:
+      name: "UXDesigner"
+      role: "User experience and interface design"
+      mbti: "ENFP"
+      provider: "claude"
+      responsibilities:
+        - "Design user interactions and workflows"
+        - "Create wireframes and prototypes"
+        - "Ensure accessibility and usability"
+        - "Validate user experience implementation"
+      tools:
+        - "ux_design"
+        - "prototyping"
+        - "accessibility_review"
+
+    quality_engineer:
+      name: "QualityEngineer"
+      role: "Quality assurance and testing strategy"
+      mbti: "ISTJ"
+      provider: "zhipuai"
+      responsibilities:
+        - "Define testing strategies and frameworks"
+        - "Review code quality and standards"
+        - "Implement automated testing pipelines"
+        - "Ensure reliability and stability"
+      tools:
+        - "testing_strategy"
+        - "code_review"
+        - "quality_assurance"
+
+    devops_specialist:
+      name: "DevOpsSpecialist"
+      role: "Infrastructure and deployment"
+      mbti: "ISTP"
+      provider: "zhipuai"
+      responsibilities:
+        - "Set up CI/CD pipelines"
+        - "Manage deployment infrastructure"
+        - "Monitor system performance and health"
+        - "Implement security and compliance measures"
+      tools:
+        - "deployment_automation"
+        - "infrastructure_management"
+        - "security_implementation"
+
+  # Application Team (Project Execution)
+  application_team:
+    project_initializer:
+      name: "ProjectInitializer"
+      role: "Initialize new AI crew projects"
+      provider: "claude"
+      responsibilities:
+        - "Execute project initialization scripts"
+        - "Create project directory structures"
+        - "Generate initial configurations"
+        - "Set up development environments"
+      tools:
+        - "file_operations"
+        - "script_execution"
+        - "environment_setup"
+
+    crew_designer:
+      name: "CrewDesigner"
+      role: "Design target AI crew architectures"
+      provider: "claude"
+      responsibilities:
+        - "Design AI crew agent structures"
+        - "Define agent roles and responsibilities"
+        - "Create workflow specifications"
+        - "Plan integration patterns"
+      tools:
+        - "crew_design"
+        - "workflow_planning"
+        - "agent_configuration"
+
+    openspec_manager:
+      name: "OpenSpecManager"
+      role: "Manage OpenSpec specifications and changes"
+      provider: "claude"
+      responsibilities:
+        - "Create and update OpenSpec documents"
+        - "Manage change proposal workflow"
+        - "Validate specification compliance"
+        - "Maintain version control"
+      tools:
+        - "document_generation"
+        - "change_management"
+        - "specification_validation"
+
+    integration_specialist:
+      name: "IntegrationSpecialist"
+      role: "Handle AI provider integrations"
+      provider: "zhipuai"
+      responsibilities:
+        - "Configure AI provider settings"
+        - "Manage API integrations"
+        - "Handle provider switching"
+        - "Monitor API usage and costs"
+      tools:
+        - "api_integration"
+        - "provider_configuration"
+        - "usage_monitoring"
+
+    deployment_manager:
+      name: "DeploymentManager"
+      role: "Manage deployment and publishing"
+      provider: "zhipuai"
+      responsibilities:
+        - "Execute deployment pipelines"
+        - "Manage Git workflows"
+        - "Handle version releases"
+        - "Coordinate automated publishing"
+      tools:
+        - "deployment_execution"
+        - "git_management"
+        - "release_management"
+
+# Workflow Configuration
+workflows:
+  project_initialization:
+    trigger: "User runs init-project.py"
+    steps:
+      - "ProjectInitializer gathers requirements"
+      - "CrewDesigner designs target crew"
+      - "OpenSpecManager creates specifications"
+      - "IntegrationSpecialist configures providers"
+      - "DeploymentManager sets up Git repo"
+
+  change_proposal:
+    trigger: "OpenSpec change proposal created"
+    steps:
+      - "Relevant advisory agents review proposal"
+      - "ProductStrategist validates strategic fit"
+      - "TechnicalArchitect reviews technical feasibility"
+      - "QualityEngineer assesses impact"
+      - "Decision made and documented"
+
+  feature_development:
+    trigger: "Approved change proposal"
+    steps:
+      - "Application team implements changes"
+      - "QualityEngineer validates implementation"
+      - "OpenSpecManager updates specifications"
+      - "DeploymentManager handles deployment"
+
+# Communication Protocols
+communication:
+  advisory_to_application:
+    channel: "OpenSpec specifications"
+    frequency: "As needed based on changes"
+    format: "Structured specifications and change proposals"
+
+  daily_sync:
+    time: "Daily at 9:00 AM"
+    participants: "All advisory and application agents"
+    format: "YAML structured updates"
+    location: "logs/daily-sync.yaml"
+
+# Error Handling
+error_handling:
+  provider_failover:
+    claude_unavailable: "Switch to zhipuai for critical tasks"
+    zhipuai_unavailable: "Switch to claude for critical tasks"
+    both_unavailable: "Queue tasks and notify user"
+
+  task_recovery:
+    automatic_retry: 3
+    escalation_to_advisory: true
+    user_notification: true
+
+# Performance Metrics
+metrics:
+  response_time:
+    claude_target: "< 2 seconds"
+    zhipuai_target: "< 3 seconds"
+
+  success_rate:
+    advisory_tasks: "> 95%"
+    application_tasks: "> 90%"
+
+  utilization:
+    claude_quota: "80% of monthly limit"
+    zhipuai_quota: "80% of monthly limit"
